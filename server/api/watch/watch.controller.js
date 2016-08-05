@@ -3,6 +3,7 @@
 import request from 'request';
 import * as validUrl from 'valid-url';
 import * as linkParser from '../../components/parser/linkParser';
+import * as urlParse from 'url';
 
 function validationError(res, statusCode) {
   statusCode = statusCode || 422;
@@ -22,7 +23,7 @@ function handleError(res, statusCode, message) {
  * Creates a entry that watches a specific product
  */
 export function create(req, res, next) {
-  
+
   var url = req.body.url;
 
   if (!validUrl.isUri(url)) {
@@ -31,13 +32,18 @@ export function create(req, res, next) {
 
   request(url, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      linkParser.parseLink(body);
+      var hostname = urlParse.parse(url).hostname.replace(/^(www\.)/, "");
+      console.log(hostname);
+      linkParser.parseLink(body, hostname, function (err, productInfo) {
+        if (err) {
+          return handleError(res, 500, err)();
+        }
+        res.status(200).json({url: url, productInfo: productInfo});
+      });
     }
     else {
-      handleError(res, 500, "Could not process url.");
+      handleError(res, 500, "Could not process url.")();
     }
   });
-
-  res.status(200).json({url: url});
 
 }

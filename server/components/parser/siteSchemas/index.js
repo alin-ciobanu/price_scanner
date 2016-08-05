@@ -1,6 +1,6 @@
 
 var sites = {
-	'bikexcs.com': require('./bikexcs')
+	'bikexcs.ro': require('./bikexcs')
 };
 
 export default sites;
