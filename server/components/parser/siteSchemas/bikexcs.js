@@ -76,13 +76,16 @@ var rules = [
 
 			var info = {};
 
+			var name = "";
+
 			for (var i = 0; i < elements.length; i++) {
 				var elem = elements[i];
 				if (elem.text) {
 					var text = (elem.text || "").trim();
-					info.productName = text;
+					name += text;
 				}
 			}
+			info.productName = name;
 			return info;
 		}
 	},
@@ -132,6 +135,8 @@ var rules = [
 				}
 				if (elem.tagnameEnd == "li") {
 					liOpen = false;
+					info.specs.push(specText.trim());
+					specText = "";
 				}
 				if (elem.tagnameStart == "div" && elem.attrs && elem.attrs.class && elem.attrs.class.indexOf("std") >= 0 && elem.attrs.itemprop == "description") {
 					descriptionStarted = true;
@@ -148,23 +153,17 @@ var rules = [
 				if (spanS2.open && elem.tagnameEnd) {
 					spanS2.stackIndex--;
 				}
-				if (spanS2.stackIndex == 0) {
+				if (spanS2.stackIndex == 0 && spanS2.open) {
 					spanS2.open = false;
+					spanS2.index = 0;
 				}
 
 				if (spanS2.open) {
 					if (elem.text) {
-						var text = (elem.text || "").trim();
-
 						spanS2.index++;
-
-						if (spanS2.index % 2 == 1) {
-							specText = text + " ";
-						}
-
-						if (spanS2.index % 2 == 0) {
-							specText += text;
-							info.specs.push(specText);
+						specText += elem.text;
+						if (spanS2.index == 1) {
+							specText += " ";
 						}
 					}
 				}
@@ -172,7 +171,7 @@ var rules = [
 					if (elem.text && liOpen) {
 						var text = (elem.text || "").trim();
 						if (text.length > 0) {
-							info.specs.push(text);
+							specText += text;
 						}
 					}
 				}
@@ -208,8 +207,10 @@ var rules = [
 				if (elem.tagnameStart == "tr" && descriptionStarted) {
 					trOpen = true;
 				}
-				if (elem.tagnameEnd == "tr") {
+				if (elem.tagnameEnd == "tr" && trOpen) {
 					trOpen = false;
+					info.specs.push(specText);
+					tdIndex = 0;
 				}
 				if (elem.tagnameStart == "div" && elem.attrs && elem.attrs.class && elem.attrs.class.indexOf("std") >= 0 && elem.attrs.itemprop == "description") {
 					descriptionStarted = true;
@@ -223,14 +224,13 @@ var rules = [
 
 					tdIndex++;
 
-					if (tdIndex % 2 == 1) {
+					if (tdIndex == 1) {
 						specText = text + ": ";
 					}
-
-					if (tdIndex % 2 == 0) {
+					else {
 						specText += text;
-						info.specs.push(specText);
 					}
+
 				}
 			}
 

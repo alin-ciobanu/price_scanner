@@ -16,7 +16,7 @@ export function parseLink (htmlInput, siteName, callback) {
 		return callback("No parsing schema for this website.");
 	}
 
-//	var data = '';
+	var data = '';
 	var parser = new htmlparser.Parser({
 	    onopentag: function(name, attribs){
 
@@ -34,7 +34,7 @@ export function parseLink (htmlInput, siteName, callback) {
 	    		}
 	    	}
 
-//	    	data += "<" + name + "> " + JSON.stringify(attribs) + "\n";
+	    	data += "<" + name + "> " + JSON.stringify(attribs) + "\n";
 
 			for (i = 0; i < currentElements.length; i++) {
 				var currentElement = currentElements[i];
@@ -51,10 +51,10 @@ export function parseLink (htmlInput, siteName, callback) {
 	    			currentElement.elements.push({text: text});
 	    		}
 	    	}
-//	    	data += text + "\n";
+	    	data += text + "\n";
 	    },
 	    onclosetag: function(tagname){
-//	    	data += "<" + tagname + "\\>" + "\n";
+	    	data += "<" + tagname + "\\>" + "\n";
 
 			for (var i = 0; i < currentElements.length; i++) {
 				var currentElement = currentElements[i];
@@ -84,7 +84,7 @@ export function parseLink (htmlInput, siteName, callback) {
 			}
 	    },
 	    onend: function () {
-//	    	require('fs').writeFile('test.txt', data);
+	    	require('fs').writeFile('test.txt', data);
             callback(null, productInfo);
 	    }
 	}, {decodeEntities: true});
